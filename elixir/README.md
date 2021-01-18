@@ -7,7 +7,7 @@ The easiest way to install postgres is through brew:
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
+  * Create and migrate your database with `mix ecto.setup`  
   * Start Phoenix endpoint with `mix phx.server`
 
 Now you can visit [`localhost:8000`](http://localhost:8000) from your browser.

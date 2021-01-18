@@ -4,9 +4,14 @@ defmodule Homework.Users do
   """
 
   import Ecto.Query, warn: false
+
+#  use Mix.Config
+#  import_config "#{Mix.env()}.exs"
+
   alias Homework.Repo
 
   alias Homework.Users.User
+
 
   @doc """
   Returns the list of users.
@@ -17,8 +22,22 @@ defmodule Homework.Users do
       [%User{}, ...]
 
   """
-  def list_users(_args) do
-    Repo.all(User)
+  def list_users(args) do
+    fuzzyThreshold = Application.fetch_env!(:homework, :fuzzy_threshold)
+
+    case args do
+      %{:name => name} ->
+        start_character = String.slice(name, 0..1)
+
+        Repo.all(from u in User,
+                 where: ilike(u.first_name, ^"#{start_character}%") or ilike(u.last_name, ^"#{start_character}%"),
+                 where: fragment("SIMILARITY(?, ?) > ?", u.first_name, ^name, ^fuzzyThreshold) or fragment("SIMILARITY(?, ?) > ?", u.last_name, ^name, ^fuzzyThreshold)
+        )
+      _ ->
+        Repo.all(User)
+    end
+
+
   end
 
   @doc """
