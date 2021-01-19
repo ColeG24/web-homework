@@ -9,7 +9,7 @@ defmodule Homework.Users do
 #  import_config "#{Mix.env()}.exs"
 
   alias Homework.Repo
-
+  alias Homework.Paging.Paging
   alias Homework.Users.User
 
 
@@ -23,21 +23,21 @@ defmodule Homework.Users do
 
   """
   def list_users(args) do
-    fuzzyThreshold = Application.fetch_env!(:homework, :fuzzy_threshold)
+    Paging.paginate(create_user_base_query(args), args)
+  end
 
+  defp create_user_base_query(args) do
     case args do
       %{:name => name} ->
+        fuzzyThreshold = Application.fetch_env!(:homework, :fuzzy_threshold)
         start_character = String.slice(name, 0..1)
 
-        Repo.all(from u in User,
-                 where: ilike(u.first_name, ^"#{start_character}%") or ilike(u.last_name, ^"#{start_character}%"),
-                 where: fragment("SIMILARITY(?, ?) > ?", u.first_name, ^name, ^fuzzyThreshold) or fragment("SIMILARITY(?, ?) > ?", u.last_name, ^name, ^fuzzyThreshold)
-        )
+        from u in User,
+           where: ilike(u.first_name, ^"#{start_character}%") or ilike(u.last_name, ^"#{start_character}%"),
+           where: fragment("SIMILARITY(?, ?) > ?", u.first_name, ^name, ^fuzzyThreshold) or fragment("SIMILARITY(?, ?) > ?", u.last_name, ^name, ^fuzzyThreshold)
       _ ->
-        Repo.all(User)
+        User
     end
-
-
   end
 
   @doc """

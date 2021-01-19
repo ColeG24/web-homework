@@ -6,6 +6,11 @@ defmodule HomeworkWeb.Schemas.UsersSchema do
 
   alias HomeworkWeb.Resolvers.UsersResolver
 
+  object :pagedUser do
+    field(:items, list_of(:user))
+    field(:total, :integer)
+  end
+
   object :user do
     field(:id, non_null(:id))
     field(:dob, :string)

@@ -16,9 +16,13 @@ defmodule HomeworkWeb.Schema do
     end
 
     @desc "Get all Users"
-    field(:users, list_of(:user)) do
-      arg :name, :string
-      resolve(&UsersResolver.users/3)
+
+    field(:user, list_of(:pagedUser))
+      do
+        arg(:name, :string)
+        arg(:limit, non_null(:integer))
+        arg(:skip, non_null(:integer))
+        resolve(&UsersResolver.users/3)
     end
 
     @desc "Get all Merchants"
