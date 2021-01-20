@@ -10,8 +10,7 @@ defmodule Homework.Paging.Paging do
 
     pagedQuery = from r in subquery(baseQuery), limit: ^limit, offset: ^skip, order_by: r.inserted_at
     results = Repo.all(pagedQuery)
-    IO.inspect(countRes)
-    %{items: results, total: countRes}
+    %{items: results, total_rows: countRes}
     end
 
   def paginate(baseQuery, args) do

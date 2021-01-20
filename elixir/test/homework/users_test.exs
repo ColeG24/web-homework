@@ -23,9 +23,34 @@ defmodule Homework.UsersTest do
       user
     end
 
-    test "list_users/1 returns all users" do
+    test "list_users/1 returns all users and total row count" do
       user = user_fixture()
-      assert Users.list_users([]) == [user]
+      res = Users.list_users(%{limit: 100, skip: 0})
+      assert res.items == [user]
+      assert res.total_rows == 1
+    end
+
+    test "list_users/1 returns no users when limit is 0 " do
+      _ = user_fixture()
+
+      res = Users.list_users(%{limit: 0, skip: 0})
+      assert res.items == []
+      assert res.total_rows == 1
+    end
+
+    test "list_users/1 returns no users when skip is > than total rows " do
+      _ = user_fixture()
+      res = Users.list_users(%{limit: 100, skip: 10})
+      assert res.items == []
+      assert res.total_rows == 1
+    end
+
+    test "list_users/1 returns subset of total users when using skip" do
+      _ = user_fixture()
+      user2 = user_fixture()
+      res = Users.list_users(%{limit: 100, skip: 1})
+      assert res.items == [user2]
+      assert res.total_rows == 2
     end
 
     test "get_user!/1 returns the user with given id" do

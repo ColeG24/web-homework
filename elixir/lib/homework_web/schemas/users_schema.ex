@@ -8,7 +8,7 @@ defmodule HomeworkWeb.Schemas.UsersSchema do
 
   object :pagedUser do
     field(:items, list_of(:user))
-    field(:total, :integer)
+    field(:total_rows, :integer)
   end
 
   object :user do

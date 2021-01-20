@@ -23,18 +23,23 @@ defmodule Homework.Users do
 
   """
   def list_users(args) do
-    Paging.paginate(create_user_base_query(args), args)
+    Paging.paginate(create_list_users_base_query(args), args)
   end
 
-  defp create_user_base_query(args) do
+  @doc """
+  Given args from graphql, will create a base query to get a list of users with any non pagination filters in place.
+  Does not handle limit or skip filters.
+
+  """
+  defp create_list_users_base_query(args) do
     case args do
       %{:name => name} ->
-        fuzzyThreshold = Application.fetch_env!(:homework, :fuzzy_threshold)
+        fuzzy_threshold = Application.fetch_env!(:homework, :fuzzy_threshold)
         start_character = String.slice(name, 0..1)
 
         from u in User,
            where: ilike(u.first_name, ^"#{start_character}%") or ilike(u.last_name, ^"#{start_character}%"),
-           where: fragment("SIMILARITY(?, ?) > ?", u.first_name, ^name, ^fuzzyThreshold) or fragment("SIMILARITY(?, ?) > ?", u.last_name, ^name, ^fuzzyThreshold)
+           where: fragment("SIMILARITY(?, ?) > ?", u.first_name, ^name, ^fuzzy_threshold) or fragment("SIMILARITY(?, ?) > ?", u.last_name, ^name, ^fuzzy_threshold)
       _ ->
         User
     end
