@@ -5,9 +5,6 @@ defmodule Homework.Users do
 
   import Ecto.Query, warn: false
 
-#  use Mix.Config
-#  import_config "#{Mix.env()}.exs"
-
   alias Homework.Repo
   alias Homework.Paging.Paging
   alias Homework.Users.User
