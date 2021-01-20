@@ -23,4 +23,26 @@ defmodule Homework.Transactions.Transaction do
     |> cast(attrs, [:user_id, :amount, :credit, :debit, :description, :merchant_id])
     |> validate_required([:user_id, :amount, :description, :merchant_id])
   end
+
+  @doc """
+   Converts from cents representation(1048) to decimal (10.48)
+  """
+  def from_cents(transaction) when is_integer(transaction.amount) do
+    amount_to_decimal = transaction.amount / 100
+    %{transaction | amount: amount_to_decimal}
+  end
+
+
+  @doc """
+   Converts from decimal representation(10.48) to cents (1048)
+  """
+  def to_cents(transaction) when is_float(transaction.amount) do
+    amount_to_cents = round(transaction.amount * 100)
+
+    %{transaction | amount: amount_to_cents}
+  end
+
+  def to_cents(transaction) when is_nil(transaction.amount) do
+    transaction
+  end
 end

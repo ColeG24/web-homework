@@ -18,7 +18,8 @@ defmodule Homework.Transactions do
 
   """
   def list_transactions(_args) do
-    Repo.all(Transaction)
+    transaction_in_cents = Repo.all(Transaction)
+    Enum.map(transaction_in_cents, &Transaction.from_cents/1)
   end
 
   @doc """
@@ -35,7 +36,10 @@ defmodule Homework.Transactions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_transaction!(id), do: Repo.get!(Transaction, id)
+  def get_transaction!(id) do
+    Repo.get!(Transaction, id)
+    |> Transaction.from_cents()
+  end
 
   @doc """
   Creates a transaction.
@@ -51,7 +55,7 @@ defmodule Homework.Transactions do
   """
   def create_transaction(attrs \\ %{}) do
     %Transaction{}
-    |> Transaction.changeset(attrs)
+    |> Transaction.changeset(Transaction.to_cents(attrs))
     |> Repo.insert()
   end
 
@@ -69,7 +73,8 @@ defmodule Homework.Transactions do
   """
   def update_transaction(%Transaction{} = transaction, attrs) do
     transaction
-    |> Transaction.changeset(attrs)
+    |> Transaction.to_cents()
+    |> Transaction.changeset(Transaction.to_cents(attrs))
     |> Repo.update()
   end
 

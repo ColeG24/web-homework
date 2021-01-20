@@ -1,7 +1,6 @@
 defmodule Homework.TransactionsTest do
   use Homework.DataCase
 
-  alias Ecto.UUID
   alias Homework.Merchants
   alias Homework.Transactions
   alias Homework.Users
@@ -34,7 +33,7 @@ defmodule Homework.TransactionsTest do
         })
 
       valid_attrs = %{
-        amount: 42,
+        amount: 0.42,
         credit: true,
         debit: true,
         description: "some description",
@@ -43,7 +42,7 @@ defmodule Homework.TransactionsTest do
       }
 
       update_attrs = %{
-        amount: 43,
+        amount: 0.43,
         credit: false,
         debit: false,
         description: "some updated description",
@@ -78,7 +77,7 @@ defmodule Homework.TransactionsTest do
         |> Enum.into(valid_attrs)
         |> Transactions.create_transaction()
 
-      transaction
+      Transaction.from_cents(transaction)
     end
 
     test "list_transactions/1 returns all transactions", %{valid_attrs: valid_attrs} do
@@ -89,6 +88,38 @@ defmodule Homework.TransactionsTest do
     test "get_transaction!/1 returns the transaction with given id", %{valid_attrs: valid_attrs} do
       transaction = transaction_fixture(valid_attrs)
       assert Transactions.get_transaction!(transaction.id) == transaction
+    end
+
+    test "Converting transaction to cents works correctly" do
+      decimal_transaction = %{
+        amount: 3.32
+      }
+
+      assert Transaction.to_cents(decimal_transaction).amount == 332
+    end
+
+    test "Converting transaction from cents works correctly" do
+      cents_transaction = %{
+        amount: 332
+      }
+
+      assert Transaction.from_cents(cents_transaction).amount == 3.32
+    end
+
+    test "Calling to cents fails when it is already in cents" do
+      cents_transaction = %{
+        amount: 332
+      }
+
+      assert_raise FunctionClauseError, fn -> Transaction.to_cents(cents_transaction) end
+    end
+
+    test "Calling from cents fails when it is already in decimal" do
+      cents_transaction = %{
+        amount: 3.32
+      }
+
+      assert_raise FunctionClauseError, fn -> Transaction.from_cents(cents_transaction) end
     end
 
     test "create_transaction/1 with valid data creates a transaction", %{
